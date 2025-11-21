@@ -9,24 +9,24 @@ from flask_mail import Mail, Message
 app = Flask(__name__)
 
 # ================================
-# CONFIGURAÇÕES DO FLASK-MAIL (LOCAL)
+# CONFIGURAÇÕES DO FLASK-MAIL (LOCAL/RENDER)
+# USANDO VARIÁVEIS DE AMBIENTE PARA SEGURANÇA
 # ================================
-# Apenas preencha com seu Gmail e sua senha de app.
-# Não use a senha normal do Gmail.
 
+# Configurações de Servidor
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 
-# Coloque seu e-mail e sua senha de app aqui
-app.config['MAIL_USERNAME'] = "cetepouvidoria6@gmail.com"            # <-- SEU E-MAIL
-app.config['MAIL_PASSWORD'] = "iuuo phxy wxab wuxz"              # <-- SENHA DE APP
+# Credenciais carregadas do ambiente (DEVE ser configurado no Render)
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
 
 # Remetente padrão
 app.config['MAIL_DEFAULT_SENDER'] = app.config['MAIL_USERNAME']
 
-# E-mail que receberá as manifestações
-ADMIN_EMAIL = "maciodejesus0@gmail.com"
+# E-mail que receberá as manifestações (Também do ambiente)
+ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL')
 
 mail = Mail(app)
 
@@ -36,8 +36,9 @@ mail = Mail(app)
 DATA_FILE = "manifestacoes.json"
 MATRICULAS_FILE = "matriculas_validas.json"
 
-admin_user = "admin"
-admin_pass = "1234"   # senha local
+# Credenciais Admin carregadas do ambiente (DEVE ser configurado no Render)
+admin_user = os.environ.get('ADMIN_USER', "admin") 
+admin_pass = os.environ.get('ADMIN_PASS', "1234")   
 
 
 # ================================
@@ -147,7 +148,8 @@ def registrar():
         manifestacoes.append(nova)
         salvar_manifestacoes(manifestacoes)
 
-        enviar_email(protocolo, tipo)
+        # Linha removida/comentada para desativar o envio de e-mail de notificação:
+        # enviar_email(protocolo, tipo) 
 
         return jsonify({"protocolo": protocolo})
 
