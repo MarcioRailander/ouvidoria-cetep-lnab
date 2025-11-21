@@ -4,31 +4,12 @@ import random
 import re
 from datetime import datetime
 from flask import Flask, render_template, request, jsonify, redirect, url_for
-from flask_mail import Mail, Message
 
 app = Flask(__name__)
 
 # ================================
-# CONFIGURAÇÕES DO FLASK-MAIL (LOCAL/RENDER)
-# USANDO VARIÁVEIS DE AMBIENTE PARA SEGURANÇA
+# CONFIGURAÇÕES (TODAS AS DE E-MAIL FORAM REMOVIDAS)
 # ================================
-
-# Configurações de Servidor
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-
-# Credenciais carregadas do ambiente (DEVE ser configurado no Render)
-app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
-app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
-
-# Remetente padrão
-app.config['MAIL_DEFAULT_SENDER'] = app.config['MAIL_USERNAME']
-
-# E-mail que receberá as manifestações (Também do ambiente)
-ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL')
-
-mail = Mail(app)
 
 # ================================
 # ARQUIVOS DE DADOS
@@ -36,7 +17,7 @@ mail = Mail(app)
 DATA_FILE = "manifestacoes.json"
 MATRICULAS_FILE = "matriculas_validas.json"
 
-# Credenciais Admin carregadas do ambiente (DEVE ser configurado no Render)
+# Credenciais Admin (Mantenho a sugestão de usar variáveis de ambiente por segurança)
 admin_user = os.environ.get('ADMIN_USER', "admin") 
 admin_pass = os.environ.get('ADMIN_PASS', "1234")   
 
@@ -77,29 +58,7 @@ def validar_matricula(matricula):
     lista = carregar_matriculas_validas()
     return matricula in lista
 
-def enviar_email(protocolo, tipo):
-    """Envia notificação de nova manifestação."""
-    try:
-        msg = Message(
-            subject=f"Nova Manifestação Registrada – Protocolo {protocolo}",
-            recipients=[ADMIN_EMAIL]
-        )
-
-        msg.body = f"""
-        Nova manifestação registrada.
-
-        Protocolo: {protocolo}
-        Tipo: {tipo.capitalize()}
-
-        Acesse o painel administrativo.
-        """
-
-        mail.send(msg)
-        print("E-mail enviado com sucesso!")
-
-    except Exception as e:
-        print(f"Erro ao enviar e-mail: {e}")
-
+# A função enviar_email foi removida.
 
 # ================================
 # ROTAS PRINCIPAIS
@@ -148,8 +107,7 @@ def registrar():
         manifestacoes.append(nova)
         salvar_manifestacoes(manifestacoes)
 
-        # Linha removida/comentada para desativar o envio de e-mail de notificação:
-        # enviar_email(protocolo, tipo) 
+        # O envio de e-mail foi removido. A função registrar agora só salva no JSON.
 
         return jsonify({"protocolo": protocolo})
 
